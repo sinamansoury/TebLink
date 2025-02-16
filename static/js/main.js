@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://80c3-45-93-169-35.ngrok-free.app/api/consultant/";
+const API_BASE_URL = "https://teblink.onrender.com/api/consultant/";
 
 async function fetchSpecialities() {
     try {

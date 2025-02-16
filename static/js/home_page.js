@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('speciality-name').textContent = consultant; // مقداردهی از متغیر گلوبال در HTML
 
-    const API_URL = `https://80c3-45-93-169-35.ngrok-free.app/doctor/api/doctors/${consultant}/`;
+    const API_URL = `https://teblink.onrender.com/doctor/api/doctors/${consultant}/`;
 
     async function fetchDoctors() {
         try {
