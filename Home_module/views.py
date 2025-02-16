@@ -12,7 +12,7 @@ from Home_module.serializers import DoctorsSerializer, AppointmentSlotSerializer
 # Create your views here.
 
 class DoctorsView(TemplateView):
-    template_name = 'بشنث.html'
+    template_name = 'doctor.html'
 
 class DoctorsApiView(APIView):
     def get(self, request, consultant):
