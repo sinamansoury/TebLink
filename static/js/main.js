@@ -1,4 +1,4 @@
- const API_BASE_URL = "https://teblink.onrender.com/api/consultant/";
+ const API_BASE_URL = "api/consultant/";
 
 async function fetchSpecialities() {
     try {
