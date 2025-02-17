@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}TebLink{% endblock %}
+{% block content %}
+    <!-- کانتینر اصلی -->
+    <div class="max-w-6xl w-full">
+        <h1 class="text-4xl font-extrabold text-blue-600 text-center mb-8"></h1>
+        <div class="flex justify-center items-center bg-white shadow-md rounded-lg w-full max-w-3xl mx-auto">
+            <input type="text" placeholder="جستجوی پزشک، تخصص یا کلینیک..."
+                   class="w-full py-2 px-3 rounded-md outline-none text-gray-700">
+            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 ml-3">
+                جستجو 🔍
+            </button>
+        </div>
+
+        <h1 class="text-4xl font-extrabold text-blue-600 text-center mb-8"></h1>
+        <div id="specialities" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+    </div>
+
+    <script src="{% static 'js/main.js' %}"></script>
+{% endblock %}
+        
+    
+
+
