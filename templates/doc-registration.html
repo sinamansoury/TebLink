@@ -1,0 +1,281 @@
+{% extends 'layout.html' %}
+{% block title %}ورود پزشکان{% endblock %}
+{% block content %}
+
+    <!-- صفحه ورود و تایید OTP -->
+    <div id="otp-page" class="flex items-center justify-center mt-10">
+        <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md" >
+            <h2 class="text-2xl font-bold text-center text-blue-600 mb-6" >ورود پزشکان</h2>
+
+            <form id="otp-form">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="block font-bold text-black " dir="rtl">شماره موبایل</label>
+                    <input type="tel" id="phone-number" class="w-full p-2 border rounded-lg" required>
+                </div>
+
+                <button type="button" id="send-otp" class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700">
+                    ارسال کد
+                </button>
+
+                <div id="otp-section" class="mt-4 hidden">
+                    <label class="block font-bold text-black" dir="rtl">کد تأیید</label>
+                    <div class="flex gap-2 justify-center">
+                        <input type="text" maxlength="1" class="otp-box w-10 text-center border rounded-lg p-2 text-lg font-bold" dir="ltr" required>
+                        <input type="text" maxlength="1" class="otp-box w-10 text-center border rounded-lg p-2 text-lg font-bold" dir="ltr" required>
+                        <input type="text" maxlength="1" class="otp-box w-10 text-center border rounded-lg p-2 text-lg font-bold" dir="ltr" required>
+                        <input type="text" maxlength="1" class="otp-box w-10 text-center border rounded-lg p-2 text-lg font-bold" dir="ltr" required>
+                        <input type="text" maxlength="1" class="otp-box w-10 text-center border rounded-lg p-2 text-lg font-bold" dir="ltr" required>
+                    </div>
+
+
+                    <button type="submit" class="w-full mt-4 bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700">
+                        تأیید
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- صفحه ثبت‌نام پزشکان -->
+    <div id="register-page" class="flex items-center justify-center mt-10 hidden">
+        <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-3xl" dir="rtl">
+            <h2 class="text-2xl font-bold text-center text-blue-600 mb-6">فرم ثبت‌نام پزشکان</h2>
+
+            <form id="doctor-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-bold text-black">نام</label>
+                        <input type="text" id="first-name" class="w-full p-2 border rounded-lg" required>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-black">نام خانوادگی</label>
+                        <input type="text" id="last-name" class="w-full p-2 border rounded-lg" required>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-black">کد ملی</label>
+                        <input type="text" id="national-id" class="w-full p-2 border rounded-lg" required>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-black">تاریخ تولد</label>
+                        <input type="date" id="birth-date" class="w-full p-2 border rounded-lg" required>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-black">شماره نظام پزشکی</label>
+                        <input type="text" id="medical-id" class="w-full p-2 border rounded-lg" required>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-black">جنسیت</label>
+                        <select id="gender" class="w-full p-2 border rounded-lg" required>
+                            <option value="">انتخاب کنید</option>
+                            <option value="male">مرد</option>
+                            <option value="female">زن</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-black">مدرک تحصیلی</label>
+                        <select id="degree" class="w-full p-2 border rounded-lg" required>
+                            <option value="">انتخاب کنید</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-black">تخصص</label>
+                        <select id="specialty" class="w-full p-2 border rounded-lg" required>
+                            <option value="">انتخاب کنید</option>
+                            <!-- تخصص‌ها به صورت داینامیک اضافه می‌شوند -->
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full mt-6 bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700">
+                    ثبت‌نام
+                </button>
+            </form>
+        </div>
+    </div>
+    <script>
+        function getCSRFToken() {
+            let csrfToken = null;
+            document.cookie.split(';').forEach(function (cookie) {
+                if (cookie.trim().startsWith('csrftoken=')) {
+                    csrfToken = cookie.trim().substring('csrftoken='.length);
+                }
+            });
+            return csrfToken;
+        }
+        document.addEventListener("DOMContentLoaded", function () {
+            // دریافت مقادیر از API
+            fetch('/api/degree/')
+                .then(response => response.json())
+                .then(data => {
+                    const degreeSelect = document.getElementById('degree');
+
+                    // اضافه کردن گزینه‌های دریافت شده به dropdown
+                    data.forEach(degree => {  // داده‌ها به صورت مستقیم لیست هستند
+                        const option = document.createElement('option');
+                        option.value = degree.id; // یا هر چیزی که برای value لازم دارید
+                        option.textContent = degree.name;
+                        degreeSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error("خطا در دریافت داده‌ها:", error);
+                });
+        });
+        document.getElementById("degree").addEventListener("change", function () {
+    const degreeId = this.value;
+
+    if (degreeId) {
+        fetch(`/api/specialty/${degreeId}/`)
+            .then(response => response.json())
+            .then(data => {
+                const specialtySelect = document.getElementById("specialty");
+                specialtySelect.innerHTML = '<option value="">انتخاب کنید</option>';  // پاک کردن تخصص‌های قبلی
+
+                // اضافه کردن تخصص‌های جدید به dropdown
+                data.forEach(specialty => {
+                    const option = document.createElement('option');
+                    option.value = specialty.id;
+                    option.textContent = specialty.name;
+                    specialtySelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error("خطا در دریافت تخصص‌ها:", error);
+            });
+    } else {
+        // اگر مدرک انتخاب نشده بود، فیلد تخصص را خالی کنید
+        document.getElementById("specialty").innerHTML = '<option value="">انتخاب کنید</option>';
+    }
+});
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const otpInputs = document.querySelectorAll(".otp-box");
+
+            otpInputs.forEach((input, index) => {
+                input.addEventListener("input", (e) => {
+                    if (e.target.value.length === 1 && index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus(); // رفتن به فیلد بعدی
+                    }
+                });
+
+                input.addEventListener("keydown", (e) => {
+                    if (e.key === "Backspace" && input.value.length === 0 && index > 0) {
+                        otpInputs[index - 1].focus(); // بازگشت به فیلد قبلی
+                    }
+                });
+            });
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            const phoneInput = document.getElementById("phone-number");
+            const sendOtpBtn = document.getElementById("send-otp");
+            const otpInputs = document.querySelectorAll(".otp-box");
+            const otpForm = document.getElementById("otp-form");
+            const doctorForm = document.getElementById("doctor-form");
+
+            let phoneNumber = "";
+
+            // 📌 ارسال شماره موبایل برای دریافت یا تأیید OTP
+            sendOtpBtn.addEventListener("click", function () {
+                phoneNumber = phoneInput.value.trim();
+
+                if (!phoneNumber || phoneNumber.length !== 11 || !/^09\d{9}$/.test(phoneNumber)) {
+                    alert("لطفاً یک شماره موبایل معتبر وارد کنید.");
+                    return;
+                }
+
+                fetch("/api/doctor/", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json",
+                    "X-CSRFToken": getCSRFToken()},
+                    body: JSON.stringify({ phone: phoneNumber, step: "send_otp" })  // ارسال درخواست OTP
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById("otp-section").classList.remove("hidden");
+                            otpInputs[0].focus();
+                        } else {
+                            alert(data.message || "ارسال OTP ناموفق بود.");
+                        }
+                    })
+                    .catch(error => console.error("خطا در ارسال OTP:", error));
+            });
+
+            // 📌 تأیید OTP
+            otpForm.addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                let otpCode = Array.from(otpInputs).map(input => input.value.trim()).join("");
+                if (otpCode.length !== 5) {
+                    alert("لطفاً کد تأیید ۵ رقمی را وارد کنید.");
+                    return;
+                }
+
+                fetch("/api/doctor/", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json",
+                    "X-CSRFToken": getCSRFToken()},
+                    body: JSON.stringify({ phone: phoneNumber, otp: otpCode, step: "verify_otp" })  // تأیید OTP
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById("otp-page").classList.add("hidden");
+                            document.getElementById("register-page").classList.remove("hidden");
+                        } else {
+                            alert("کد تأیید اشتباه است. لطفاً مجدداً تلاش کنید.");
+                            otpInputs.forEach(input => input.value = "");  // پاک کردن فیلدهای OTP
+
+                        }
+                    })
+                    .catch(error => console.error("خطا در تایید OTP:", error));
+            });
+
+            // 📌 ارسال اطلاعات ثبت‌نام پزشک
+            doctorForm.addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                const formData = {
+                    phone: phoneNumber,
+                    first_name: document.getElementById("first-name").value.trim(),
+                    last_name: document.getElementById("last-name").value.trim(),
+                    national_id: document.getElementById("national-id").value.trim(),
+                    birth_date: document.getElementById("birth-date").value.trim(),
+                    medical_id: document.getElementById("medical-id").value.trim(),
+                    gender: document.getElementById("gender").value,
+                    degree: document.getElementById("degree").value,
+                    specialty: document.getElementById("specialty").value,
+                    step: "register"
+                };
+
+                fetch("/api/doctor/", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json",
+                    "X-CSRFToken": getCSRFToken()},
+                    body: JSON.stringify(formData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert("ثبت‌نام با موفقیت انجام شد!");
+                            window.location.href = "/";
+                        } else {
+                            alert(data.message || "ثبت‌نام ناموفق بود.");
+                        }
+                    })
+                    .catch(error => console.error("خطا در ثبت‌نام:", error));
+            });
+        });
+
+
+    </script>
+
+
+
+{% endblock %}

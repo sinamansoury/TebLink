@@ -2,7 +2,6 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
 from datetime import timedelta, datetime
 
-from Main_module.models import Speciality, Consultant
 
 
 class User(AbstractUser):
@@ -20,44 +19,57 @@ class User(AbstractUser):
         verbose_name = 'کاربر'
         verbose_name_plural = 'کاربران'
 
+class Degree(models.Model):
+    degree_choices = [
+        ('پزشک عمومی', 'پزشک عمومی'),
+        ('متخصص', 'متخصص'),
+        ('phd', 'PhD'),
+        ('کارشناسی ارشد', 'کارشناسی ارشد'),
+        ('کارشناسی', 'کارشناسی'),
+        ('دستیار تخصصی', 'دستیار تخصصی')
+    ]
+
+    name = models.CharField(
+        max_length=100,
+        choices=degree_choices,
+        unique=True,
+        verbose_name='مدرک تحصیلی'
+    )
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'مدرک تحصیلی'
+        verbose_name_plural = 'مدارک تحصیلی'
+
+class Specialty(models.Model):
+    name = models.CharField(max_length=100, verbose_name="رشته پزشکی")
+    degrees = models.ManyToManyField(Degree, related_name='specialties', verbose_name="مدرک‌های تحصیلی")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'رشته پزشکی'
+        verbose_name_plural = 'رشته‌های پزشکی'
 
 class Doctors(models.Model):
-    name = models.CharField(max_length=100, verbose_name="نام و نام خانوادگی")
-    speciality_name = models.CharField(max_length=100, verbose_name='تخصص پزشک')
-    consultant = models.ForeignKey(Consultant,on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        verbose_name='دسته بندی'
-    )
-    speciality = models.ForeignKey(Speciality, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="تخصص")
-    number = models.IntegerField(verbose_name='شماره نظام پزشکی', unique=True)
-    address = models.CharField(max_length=100, verbose_name='آدرس')
+    name = models.CharField(max_length=100,null=True, blank=True, verbose_name="نام")
+    last_name = models.CharField(max_length=100,null=True, blank=True, verbose_name="نام خانوادگی")
+    speciality_name = models.CharField(max_length=100,null=True, blank=True, verbose_name='تخصص پزشک')
+    id_code = models.IntegerField(unique=True,null=True, blank=True, verbose_name='کد ملی')
+    birthday = models.DateTimeField(null=True, blank=True, verbose_name='تاریخ تولد')
+    sex = models.CharField(choices=[('men','مرد'), ('women','زن')],null=True, blank=True,verbose_name='جنسیت',max_length=100)
+    degree = models.ForeignKey(Degree,on_delete=models.CASCADE,
+                            null=True, blank=True,verbose_name='مدرک تحصیلی')
+    degree_name= models.CharField(max_length=100,verbose_name='نام مدرک',null=True, blank=True)
+    number = models.IntegerField(verbose_name='شماره نظام پزشکی',null=True, blank=True, unique=True)
+    address = models.CharField(max_length=100, verbose_name='آدرس',null=True, blank=True,)
     phone = models.CharField(max_length=11, verbose_name='شماره موبایل', null=True, blank=True)
-    main_phone = models.CharField(max_length=11, verbose_name='شماره مطب')
-    photo = models.ImageField(upload_to="doctors")
+    main_phone = models.CharField(max_length=11, verbose_name='شماره مطب',null=True, blank=True,)
+    photo = models.ImageField(upload_to="doctors",null=True, blank=True,)
 
-    def save(self,*args, **kwargs):
-        if self.speciality_name:
-            speciality_obj, created = Speciality.objects.get_or_create(name=self.speciality_name)
-            self.speciality = speciality_obj  # مقدار `speciality` را ذخیره کن
-
-            if created:
-                speciality_obj.count = 1
-            else:
-                speciality_obj.count += 1
-            speciality_obj.save()
-
-        if self.consultant:  # بررسی اگر دسته‌بندی مقدار داشته باشد
-            consultant_obj, created = Consultant.objects.get_or_create(consultant=self.consultant.consultant)
-            self.consultant = consultant_obj
-
-            if created:
-             consultant_obj.count = 1
-            else:
-                consultant_obj.count += 1
-            consultant_obj.save()
-
-        super().save(*args, **kwargs)  # ذخیره نهایی
 
     def __str__(self):
         return self.name

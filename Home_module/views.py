@@ -5,7 +5,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from Home_module.models import Doctors, TimeSlot, AppointmentSlot
+from Home_module.models import Doctors, TimeSlot, AppointmentSlot, Degree
 from Home_module.serializers import DoctorsSerializer, AppointmentSlotSerializer
 
 
@@ -13,6 +13,8 @@ from Home_module.serializers import DoctorsSerializer, AppointmentSlotSerializer
 
 class DoctorsView(TemplateView):
     template_name = 'doctor.html'
+
+
 
 class DoctorsApiView(APIView):
     def get(self, request, consultant):

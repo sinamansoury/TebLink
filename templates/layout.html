@@ -3,15 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% endblock %}</title>
+    <title>صفحه اصلی</title>
+    <!-- استایل و اسکریپت‌های مورد نیاز برای تقویم شمسی -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/persian-date@0.1.8/dist/persian-date.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* مخفی کردن محتوا تا زمانی که کامل لود شود */
         body {
             opacity: 0;
-            transition: opacity 0.5s ;
+            transition: opacity 0.5s;
         }
+
+        #auth-modal, #otp-modal {
+            z-index: 60;
+        }
+
+        #mobile-menu {
+            z-index: 50;
+        }
+
+        .timer {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ff6b6b; /* قرمز ملایم */
+            text-align: center;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 1.5rem;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            margin: 0 5px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .otp-input:focus {
+            border-color: #007bff;
+        }
+
+        .otp-input-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        #otp-expired {
+            font-size: 1rem;
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
     </style>
 </head>
 <body class="bg-gradient-to-br from-red-100 to-blue-100 min-h-screen p-6 flex flex-col items-center">
@@ -20,26 +71,89 @@
     window.onload = function () {
         document.body.style.opacity = "1"; // بعد از لود کامل نمایش بده
     };
-     function openMenu() {
-            document.getElementById("mobile-menu").classList.remove("translate-x-full");
-        }
 
-        function closeMenu() {
-            document.getElementById("mobile-menu").classList.add("translate-x-full");
-     }
+    function openAuthModal() {
+        document.getElementById("auth-modal").classList.remove("hidden");
+    }
+
+    function closeAuthModal() {
+        document.getElementById("auth-modal").classList.add("hidden");
+    }
+
+    function openOtpModal() {
+        document.getElementById("auth-modal").classList.add("hidden"); // مخفی کردن فرم ورود
+        document.getElementById("otp-modal").classList.remove("hidden"); // نمایش فرم OTP
+        startTimer(); // شروع تایمر
+    }
+
+    function closeOtpModal() {
+        document.getElementById("otp-modal").classList.add("hidden");
+    }
+
+    // تایمر معکوس 2 دقیقه‌ای
+    let timer;
+    let timeLeft = 120; // 2 دقیقه (120 ثانیه)
+
+    function startTimer() {
+        timer = setInterval(function() {
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                document.getElementById("otp-expired").classList.remove("hidden");
+                document.getElementById("otp-time").classList.add("hidden");
+            } else {
+                document.getElementById("otp-time").textContent = `${Math.floor(timeLeft / 60)}:${timeLeft % 60 < 10 ? '0' + (timeLeft % 60) : timeLeft % 60}`;
+                timeLeft--;
+            }
+        }, 1000);
+    }
+
+    function moveFocus(current, nextFieldId) {
+        // اگر ورودی فعلی پر شد به فیلد بعدی منتقل شو
+        if (current.value.length == current.maxLength) {
+            document.getElementById(nextFieldId).focus();
+        }
+    }
+
+    function handleEnterKey(event) {
+        // اگر Enter فشرده شود، به فیلد بعدی منتقل شو
+        if (event.key === "Enter") {
+            let nextField = event.target.nextElementSibling;
+            if (nextField) {
+                nextField.focus();
+            }
+        }
+    }
+
+    function closeMenu() {
+        document.getElementById("mobile-menu").classList.add("translate-x-full");
+    }
+
+    function openMenu() {
+        document.getElementById("mobile-menu").classList.remove("translate-x-full");
+    }
+
+    function checkWindowSize() {
+        if (window.innerWidth >= 768) {
+            closeMenu();
+        }
+    }
+
+    window.addEventListener("resize", checkWindowSize);
+    checkWindowSize();
 </script>
+
 <div class="max-w-6xl w-full">
-<nav class="bg-white shadow-lg rounded-xl p-4 px-6 flex items-center justify-between">
+    <nav class="bg-white shadow-lg rounded-xl p-4 px-6 flex items-center justify-between">
         <!-- دکمه موبایل -->
         <button class="md:hidden text-gray-700 text-2xl" onclick="openMenu()">☰</button>
 
         <!-- بخش چپ (ورود، تماس، ثبت نام) -->
-        <div class="hidden md:flex items-center space-x-reverse space-x-6">
-            <button class="bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-blue-700">
+        <div class="hidden md:flex items-center gap-8">
+            <a href="javascript:void(0);" onclick="openAuthModal()" class="bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-blue-700 text-center block">
                 ورود / ثبت نام
-            </button>
+            </a>
             <a href="#" class="text-gray-700 font-medium hover:text-blue-500">تماس با ما</a>
-            <a href="#" class="text-gray-700 font-medium hover:text-blue-500">ثبت نام پزشکان</a>
+            <a href="{% url 'doc-reg' %}" class="text-gray-700 font-medium hover:text-blue-500">ثبت نام پزشکان</a>
         </div>
 
         <!-- لوگو -->
@@ -48,10 +162,10 @@
         </div>
 
         <!-- منوی دسکتاپ -->
-        <ul class="hidden md:flex space-x-reverse space-x-6 text-gray-700 font-medium">
-            <li><a href="#" class="hover:text-blue-500">صفحه اصلی</a></li>
+        <ul class="hidden md:flex gap-8 text-black font-bold">
             <li><a href="#" class="hover:text-blue-500">درباره ما</a></li>
             <li><a href="#" class="hover:text-blue-500">سوالات متداول</a></li>
+            <li><a href="{% url 'main' %}" class="hover:text-blue-500">صفحه اصلی</a></li>
         </ul>
     </nav>
 
@@ -59,18 +173,62 @@
     <div id="mobile-menu" class="fixed top-0 right-0 w-64 h-full bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50">
         <button class="absolute top-4 left-4 text-2xl text-gray-600" onclick="closeMenu()">✖</button>
         <div class="flex flex-col items-start mt-12 p-6 space-y-4">
-            <button class="bg-blue-600 text-white w-full px-5 py-2 rounded-lg font-semibold hover:bg-blue-700">
+            <a href="javascript:void(0);" onclick="openAuthModal()" class="bg-blue-600 text-white w-full px-5 py-2 rounded-lg font-semibold hover:bg-blue-700">
                 ورود / ثبت نام
-            </button>
+            </a>
+            <a href="{% url 'main' %}" class="text-gray-700 text-lg font-medium hover:text-blue-500">صفحه اصلی</a>
             <a href="#" class="text-gray-700 text-lg font-medium hover:text-blue-500">تماس با ما</a>
-            <a href="#" class="text-gray-700 text-lg font-medium hover:text-blue-500">ثبت نام پزشکان</a>
-            <a href="#" class="text-gray-700 text-lg font-medium hover:text-blue-500">صفحه اصلی</a>
+            <a href="{% url 'doc-reg' %}" class="text-gray-700 text-lg font-medium hover:text-blue-500">ثبت نام پزشکان</a>
             <a href="#" class="text-gray-700 text-lg font-medium hover:text-blue-500">درباره ما</a>
             <a href="#" class="text-gray-700 text-lg font-medium hover:text-blue-500">سوالات متداول</a>
         </div>
     </div>
 
+    <!-- Modal فرم ورود / ثبت نام -->
+    <div id="auth-modal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50 hidden">
+        <div class="bg-white p-6 rounded-lg w-96 relative">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-2xl text-gray-600">✖</button>
+            <h2 class="text-xl font-bold text-center mb-4">ورود / ثبت نام</h2>
+
+            <form>
+                <!-- فیلد شماره همراه -->
+                <div class="mb-4">
+                    <label for="phone" class="block text-gray-700">شماره همراه</label>
+                    <input type="tel" id="phone" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+
+                <button type="button" onclick="openOtpModal()" class="w-full py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700">
+                    ورود
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal فرم وارد کردن OTP -->
+    <div id="otp-modal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50 hidden">
+        <div class="bg-white p-6 rounded-lg w-96 relative">
+            <button onclick="closeOtpModal()" class="absolute top-4 right-4 text-2xl text-gray-600">✖</button>
+            <h2 class="text-xl font-bold text-center mb-4">   را وارد کنید OTP  کد </h2>
+
+            <div class="otp-input-container">
+                <input type="text" id="otp-1" class="otp-input" maxlength="1" oninput="moveFocus(this, 'otp-2')" onkeydown="handleEnterKey(event)" required>
+                <input type="text" id="otp-2" class="otp-input" maxlength="1" oninput="moveFocus(this, 'otp-3')" onkeydown="handleEnterKey(event)" required>
+                <input type="text" id="otp-3" class="otp-input" maxlength="1" oninput="moveFocus(this, 'otp-4')" onkeydown="handleEnterKey(event)" required>
+                <input type="text" id="otp-4" class="otp-input" maxlength="1" oninput="moveFocus(this, 'otp-5')" onkeydown="handleEnterKey(event)" required>
+                <input type="text" id="otp-5" class="otp-input" maxlength="1" onkeydown="handleEnterKey(event)" required>
+            </div>
+
+            <p id="otp-time" class="timer">2:00</p>
+            <p id="otp-expired" class="hidden">زمان اعتبار کد تمام شده است.</p>
+
+            <button type="submit" class="w-full py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700">
+                تایید کد
+            </button>
+        </div>
+    </div>
+
     {% block content %}{% endblock %}
+
     <footer class="bg-white text-gray-800 py-6 mt-10 rounded-lg shadow-lg">
         <div class="max-w-6xl mx-auto px-6 flex flex-col items-center space-y-4">
             <!-- لوگو -->
@@ -96,5 +254,6 @@
         </div>
     </footer>
 </div>
+
 </body>
 </html>
