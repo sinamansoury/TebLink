@@ -5,7 +5,7 @@ from . import views
 
 urlpatterns = [
     path('', views.MainView.as_view(), name='main'),
-    # path('api/consultant/', views.ConsultantApiView.as_view(), name='consultant'),
+    path('api/consultant/', views.ConsultantApiView.as_view(), name='consultant'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

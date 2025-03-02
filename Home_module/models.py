@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
 from datetime import timedelta, datetime
 
+from Main_module.models import Speciality
 
 
 class User(AbstractUser):
@@ -62,7 +63,7 @@ class Doctors(models.Model):
     birthday = models.DateTimeField(null=True, blank=True, verbose_name='تاریخ تولد')
     sex = models.CharField(choices=[('men','مرد'), ('women','زن')],null=True, blank=True,verbose_name='جنسیت',max_length=100)
     degree = models.ForeignKey(Degree,on_delete=models.CASCADE,
-                            null=True, blank=True,verbose_name='مدرک تحصیلی')
+                               null=True, blank=True,verbose_name='مدرک تحصیلی')
     degree_name= models.CharField(max_length=100,verbose_name='نام مدرک',null=True, blank=True)
     number = models.IntegerField(verbose_name='شماره نظام پزشکی',null=True, blank=True, unique=True)
     address = models.CharField(max_length=100, verbose_name='آدرس',null=True, blank=True,)
@@ -70,6 +71,22 @@ class Doctors(models.Model):
     main_phone = models.CharField(max_length=11, verbose_name='شماره مطب',null=True, blank=True,)
     photo = models.ImageField(upload_to="doctors",null=True, blank=True,)
 
+    def save(self, *args, **kwargs):
+        is_new = self.id is None
+        super().save(*args, **kwargs)
+
+        if is_new:
+            self.add_count()
+
+    def add_count(self):
+        speciality, created = Speciality.objects.get_or_create(name=self.degree_name)
+
+        if created:
+            speciality.count = 1
+            speciality.save()
+        else:
+            speciality.count += 1
+            speciality.save()
 
     def __str__(self):
         return self.name
@@ -102,10 +119,15 @@ class TimeSlot(models.Model):
     days = models.ManyToManyField(DayOfWeek)
 
     def save(self, *args, **kwargs):
+        is_new = self.id is None
         super().save(*args, **kwargs)
-        self.generate_appointment_slots()
+
+        if is_new:
+            self.generate_appointment_slots()
 
     def generate_appointment_slots(self):
+        AppointmentSlot.objects.filter(time_slot=self).delete()
+
         start_time = datetime.strptime(str(self.start_time), "%H:%M:%S").time()
         end_time = datetime.strptime(str(self.end_time), "%H:%M:%S").time()
 

@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <img src="${doctor.image || 'https://via.placeholder.com/100'}" class="rounded-full border-4 border-green-400 p-1">
                         <span class="absolute bottom-1 right-1 w-4 h-4 bg-green-500 rounded-full"></span>
                     </div>
-                    <h2 class="font-bold text-lg text-gray-800">${doctor.name}</h2>
+                    <h2 class="font-bold text-lg text-gray-800">${doctor.name} ${doctor.last_name}</h2>
                     <p class="text-sm text-gray-600">${doctor.speciality_name}</p>
                     <div class="mt-auto space-y-2 w-full">
                         <button class="w-full px-4 py-2 bg-red-400 text-white rounded-lg">مشاهده پروفایل</button>

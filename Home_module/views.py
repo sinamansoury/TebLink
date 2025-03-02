@@ -21,7 +21,8 @@ class DoctorsApiView(APIView):
         if not consultant:
             return Response({'error': 'تخصص موجود نیست'}, status=status.HTTP_400_BAD_REQUEST)
 
-        doctors = Doctors.objects.filter(consultant__consultant=consultant)
+        doctors = Doctors.objects.filter(degree_name=consultant)
+        print(consultant)
 
         if not doctors.exists():
             return Response({'error': 'پزشکان با این تخصص یافت نشد'}, status=status.HTTP_404_NOT_FOUND)

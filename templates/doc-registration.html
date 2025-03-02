@@ -108,7 +108,6 @@
             return csrfToken;
         }
         document.addEventListener("DOMContentLoaded", function () {
-            // دریافت مقادیر از API
             fetch('/api/degree/')
                 .then(response => response.json())
                 .then(data => {

@@ -28,16 +28,13 @@ class SpecialtyApiView(APIView):
         except Degree.DoesNotExist:
             return Response({"error": "مدرک یافت نشد."}, status=status.HTTP_404_NOT_FOUND)
 
-
-
 class PhoneApiView(APIView):
     def post(self, request):
-        step = request.data.get("step")  # گرفتن مرحله از درخواست
+        step = request.data.get("step")
         phone = request.data.get('phone')
         otp_entered = request.data.get('otp')
         degree = request.data.get('degree')
         specialty = request.data.get('specialty')
-
 
         if step == "send_otp":
             # ارسال OTP
@@ -79,8 +76,8 @@ class PhoneApiView(APIView):
                     return Response({'error':'تخصص موجود نی'}, status=status.HTTP_404_NOT_FOUND)
                 doctor= Doctors.objects.create(
                     phone=phone,
-                    name=doctor_data.get("first-name"),
-                    last_name=doctor_data.get("last-name"),
+                    name=doctor_data.get('first_name'),
+                    last_name=doctor_data.get('last_name'),
                     id_code=doctor_data.get("national_id"),
                     birthday=doctor_data.get("birth_date"),
                     number=doctor_data.get("medical_id"),
@@ -95,6 +92,10 @@ class PhoneApiView(APIView):
                 return Response(doctor_serializer.errors, status=HTTP_400_BAD_REQUEST)
 
         return Response({"error": "مرحله معتبر نیست."}, status=HTTP_400_BAD_REQUEST)
+
+
+
+
 
 
 
