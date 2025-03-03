@@ -1,0 +1,99 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}{{ doctor.name }} {{ doctor.last_name }}{% endblock %}
+
+{% block content %}
+    <div class="container mx-auto py-8 px-4 md:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Doctor Profile Section -->
+            <div class="bg-white p-6 rounded-lg shadow-lg col-span-1 flex flex-col items-center text-center">
+                <img id="doctor-image" src="https://via.placeholder.com/100" alt="{{ doctor.name }}" class="w-32 h-32 rounded-full border-4 border-green-400">
+                <h2 id="doctor-name" class="text-xl font-bold mt-4"></h2>
+                <p id="doctor-degree" class="text-gray-600"></p>
+                <p id="doctor-id-code" class="text-sm text-gray-500"></p>
+            </div>
+
+            <!-- Bio and Contact Section -->
+            <div class="bg-white p-6 rounded-lg shadow-lg col-span-2">
+                <h3 class="text-lg font-bold">بیوگرافی</h3>
+                <p id="doctor-bio" class="text-gray-600"></p>
+
+                <div class="mt-6">
+                    <h4 class="font-semibold text-gray-700">آدرس مطب:</h4>
+                    <p id="doctor-address" class="text-gray-600"></p>
+
+                    <h4 class="font-semibold text-gray-700 mt-4">تلفن مطب:</h4>
+                    <p id="doctor-phone" class="text-gray-600"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Services Section -->
+        <div class="bg-white mt-8 p-6 rounded-lg shadow-lg">
+            <h3 class="text-lg font-bold mb-4">خدمات قابل ارائه</h3>
+            <div id="services-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+    </div>
+
+
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    
+    const doctorName = window.location.pathname.split('/')[2].split('-')[0]; 
+    const doctorLastName = window.location.pathname.split('/')[2].split('-')[1]; 
+
+    // ساخت URL درست برای API
+    const API_URL = `/doctor/api/profile/${doctorName}-${doctorLastName}/`;
+
+    async function fetchDoctorProfile() {
+        try {
+            const response = await fetch(API_URL);
+            if (!response.ok) {
+                throw new Error("Failed to fetch doctor profile");
+            }
+
+            const doctor = await response.json();
+
+            // پر کردن داده‌ها در HTML
+            document.getElementById('doctor-name').textContent = `${doctor.name} ${doctor.last_name}`;
+            document.getElementById('doctor-degree').textContent = `${doctor.degree_name} - ${doctor.speciality_name}`;
+            document.getElementById('doctor-id-code').textContent = `کد نظام پزشکی: ${doctor.number}`;
+            document.getElementById('doctor-bio').textContent = doctor.bio || "!هنوز ثبت نشده است";
+            document.getElementById('doctor-address').textContent = doctor.address|| "!هنوز ثبت نشده است" ;
+            document.getElementById('doctor-phone').textContent = doctor.main_phone|| "!هنوز ثبت نشده است";
+
+            // آپلود تصویر
+            const imageElement = document.getElementById('doctor-image');
+            imageElement.src = doctor.image ? doctor.image : 'https://via.placeholder.com/100';
+
+            // نمایش خدمات
+            const servicesList = document.getElementById('services-list');
+            servicesList.innerHTML = ""; // پاک کردن خدمات قبلی
+            doctor.services.forEach(service => {
+                const serviceElement = document.createElement('div');
+                serviceElement.className = "flex items-center justify-between bg-gray-100 p-4 rounded-lg";
+                serviceElement.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <img src="${service.icon || 'https://via.placeholder.com/50'}" alt="${service.name}" class="w-12 h-12 rounded-full">
+                        <div>
+                            <h4 class="font-bold text-gray-800">${service.name}</h4>
+                            <p class="text-sm text-gray-600">هزینه: ${service.price_min} تا ${service.price_max} تومان</p>
+                        </div>
+                    </div>
+                    <a href="#" class="bg-blue-600 text-white px-4 py-2 rounded-lg">درخواست ویزیت</a>
+                `;
+                servicesList.appendChild(serviceElement);
+            });
+
+        } catch (error) {
+            console.error("Error fetching doctor profile:", error);
+        }
+    }
+
+    fetchDoctorProfile();
+});
+
+
+    </script>
+{% endblock %}

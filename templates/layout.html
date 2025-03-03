@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صفحه اصلی</title>
-    <!-- استایل و اسکریپت‌های مورد نیاز برای تقویم شمسی -->
+    <title>
+        {% block title %}
+            صفحه اصلی
+        {% endblock %}
+    </title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/persian-date@0.1.8/dist/persian-date.min.js"></script>
@@ -62,13 +65,13 @@
             text-align: center;
             margin-top: 10px;
         }
-        
+
     </style>
 </head>
 <body class="bg-gradient-to-br from-red-100 to-blue-100 min-h-screen p-6 flex flex-col items-center">
 
 <script src="/static/js/main.js">
-   
+
 </script>
 
 <div class="max-w-6xl w-full">

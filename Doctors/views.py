@@ -12,6 +12,7 @@ from django.core.cache import cache
 class DoctorsRegView(TemplateView):
     template_name = 'doc-registration.html'
 
+
 class DegreeApiView(APIView):
     def get(self, request):
         degree = Degree.objects.all()

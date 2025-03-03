@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% load static %}
 
-{% block title %}نمایش پزشکان | TebLink{% endblock %}
+{% block title %}{{ consultant }}{% endblock %}
 
 {% block content %}
     <div class="max-w-6xl mx-auto my-6 flex flex-row gap-6">
@@ -15,13 +15,12 @@
     </div>
 
     <div class="container mx-auto flex flex-col md:flex-row gap-6">
-        
-       <section id="doctors-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full md:w-3/4 justify-end " dir="rtl">
-    <!-- پزشکان به صورت داینامیک بارگذاری می‌شوند -->
-</section>
+        <section id="doctors-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full md:w-3/4 justify-end " dir="rtl">
+            
+        </section>
 
 
-       <aside class="w-full md:w-1/4 bg-white p-4 rounded-xl shadow-md text-right" dir="rtl">
+        <aside class="w-full md:w-1/4 bg-white p-4 rounded-xl shadow-md text-right" dir="rtl">
             <h3 class="font-bold text-lg">فیلترها</h3>
             <div class="mt-4 space-y-4">
                 <label class="flex items-center justify-between gap-2 cursor-pointer">
@@ -56,8 +55,9 @@
     </div>
 
     <script>
-    var consultant = "{{ consultant }}";
-</script>
-<script src="{% static 'js/home_page.js' %}"></script>
+        var consultant = "{{ consultant }}";
+    </script>
+    <script src="{% static 'js/home_page.js' %}">
+    </script>
 
 {% endblock %}

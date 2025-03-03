@@ -4,7 +4,6 @@ from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from Home_module.models import Doctors, TimeSlot, AppointmentSlot, Degree
 from Home_module.serializers import DoctorsSerializer, AppointmentSlotSerializer
 
@@ -12,17 +11,20 @@ from Home_module.serializers import DoctorsSerializer, AppointmentSlotSerializer
 # Create your views here.
 
 class DoctorsView(TemplateView):
-    template_name = 'doctor.html'
+    template_name = 'doctors-page.html'
 
+class DoctorReserveView(TemplateView):
+    template_name = 'doctor-reserve.html'
 
 
 class DoctorsApiView(APIView):
     def get(self, request, consultant):
+        print(consultant)
         if not consultant:
             return Response({'error': 'تخصص موجود نیست'}, status=status.HTTP_400_BAD_REQUEST)
 
         doctors = Doctors.objects.filter(degree_name=consultant)
-        print(consultant)
+
 
         if not doctors.exists():
             return Response({'error': 'پزشکان با این تخصص یافت نشد'}, status=status.HTTP_404_NOT_FOUND)
@@ -30,7 +32,14 @@ class DoctorsApiView(APIView):
         serializer = DoctorsSerializer(doctors, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class DoctorReserveApiView(APIView):
+    def get(self, request, doctor_name, doctor_last_name):
+        if not doctor_name:
+            return Response({"error": "ID ارسال نشده است"}, status=status.HTTP_400_BAD_REQUEST)
 
+        doctor = get_object_or_404(Doctors, name=doctor_name, last_name=doctor_last_name)
+        serializer = DoctorsSerializer(doctor)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 class DayApiView(APIView):
     def get(self, request):
         doctor_id = request.GET.get("doctor_id")
