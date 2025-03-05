@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
 from datetime import timedelta, datetime
-
+from django.core.validators import MinValueValidator
 from Main_module.models import Speciality
 
 
@@ -55,6 +55,26 @@ class Specialty(models.Model):
         verbose_name = 'رشته پزشکی'
         verbose_name_plural = 'رشته‌های پزشکی'
 
+class Services(models.Model):
+    name = models.CharField(max_length=100, null=True , blank=True, verbose_name='خدمات قابل ارائه')
+    min_price = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name='قیمت حداقل',
+        validators=[MinValueValidator(0)]
+    )
+    max_price = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name='قیمت حداکثر',
+        validators=[MinValueValidator(0)]
+    )
+
+
+
+    def __str__(self):
+        return self.name
+
 class Doctors(models.Model):
     name = models.CharField(max_length=100,null=True, blank=True, verbose_name="نام")
     last_name = models.CharField(max_length=100,null=True, blank=True, verbose_name="نام خانوادگی")
@@ -70,6 +90,8 @@ class Doctors(models.Model):
     phone = models.CharField(max_length=11, verbose_name='شماره موبایل', null=True, blank=True)
     main_phone = models.CharField(max_length=11, verbose_name='شماره مطب',null=True, blank=True,)
     photo = models.ImageField(upload_to="doctors",null=True, blank=True,)
+    services = models.ManyToManyField(Services, null=True , blank=True, verbose_name='خدمات قابل ارائه')
+    bio = models.CharField(max_length=300, null=True, blank=True, verbose_name='بیوگرافی')
 
     def save(self, *args, **kwargs):
         is_new = self.id is None

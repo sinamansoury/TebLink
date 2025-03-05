@@ -19,7 +19,7 @@ class DoctorReserveView(TemplateView):
 
 class DoctorsApiView(APIView):
     def get(self, request, consultant):
-        print(consultant)
+
         if not consultant:
             return Response({'error': 'تخصص موجود نیست'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -32,14 +32,20 @@ class DoctorsApiView(APIView):
         serializer = DoctorsSerializer(doctors, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class DoctorReserveApiView(APIView):
-    def get(self, request, doctor_name, doctor_last_name):
-        if not doctor_name:
+
+class DoctorProfileApiView(APIView):
+    def post(self, request, doctor_name, doctor_last_name):
+        doctor_id = request.data.get("doctor_id")
+
+        if not doctor_id:
             return Response({"error": "ID ارسال نشده است"}, status=status.HTTP_400_BAD_REQUEST)
 
-        doctor = get_object_or_404(Doctors, name=doctor_name, last_name=doctor_last_name)
+
+        doctor = get_object_or_404(Doctors, id=doctor_id)
         serializer = DoctorsSerializer(doctor)
+
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 class DayApiView(APIView):
     def get(self, request):
         doctor_id = request.GET.get("doctor_id")

@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
             doctorsListElement.innerHTML = ""; // پاک کردن محتوای قبلی
 
             data.forEach(doctor => {
-                // ساخت لینک پروفایل و ذخیره آن در کانست
                 const profileLink = `/doctor/${doctor.name}-${doctor.last_name}/profile`;
 
                 const doctorCard = document.createElement('div');
@@ -24,13 +23,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <h2 class="font-bold text-lg text-gray-800">${doctor.name} ${doctor.last_name}</h2>
                     <p class="text-sm text-gray-600">${doctor.speciality_name}</p>
                     <div class="mt-auto space-y-2 w-full">
-                        <!-- مخفی کردن doctor_id در داخل فیلد hidden -->
                         <input type="hidden" class="doctor-id" value="${doctor.id}">
-
-                        <!-- استفاده از لینک پروفایل در کانست -->
-                        <a href="${profileLink}" 
+                        <a href="#" 
                            class="profile-link w-full px-4 py-2 bg-red-400 text-white rounded-lg text-center block"
-                           data-id="${doctor.id}">
+                           data-id="${doctor.id}" data-url="${profileLink}">
                             مشاهده پروفایل
                         </a>
                         
@@ -43,24 +39,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
                 doctorsListElement.prepend(doctorCard);
 
-                // اضافه کردن ایونت کلیک برای لینک پروفایل
-                const profileLinkElement = doctorCard.querySelector('.profile-link');
-                profileLinkElement.addEventListener('click', function(e) {
-                    e.preventDefault(); // جلوگیری از رفرش صفحه
-
-                    // استفاده از href برای هدایت به پروفایل
-                    window.location.href = profileLink;
+                // ذخیره doctor_id هنگام کلیک روی مشاهده پروفایل
+                doctorCard.querySelector('.profile-link').addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const doctorId = doctor.id;
+                    localStorage.setItem("doctor_id", doctorId); // ذخیره ID در localStorage
+                    window.location.href = profileLink; // هدایت به صفحه پروفایل
                 });
 
                 // ارسال ID دکتر هنگام کلیک روی درخواست ویزیت
-                const appointmentLink = doctorCard.querySelector('.appointment-link');
-                appointmentLink.addEventListener('click', function(e) {
+                doctorCard.querySelector('.appointment-link').addEventListener('click', function(e) {
                     e.preventDefault();
-
-                    const doctorId = doctorCard.querySelector('.doctor-id').value;
-                    // ارسال درخواست به بک‌اند با استفاده از doctorId
-                    console.log("Doctor ID for appointment request: " + doctorId);
-                    // می‌توانید از fetch یا AJAX برای ارسال این ID به سرور استفاده کنید
+                    console.log("🩺 درخواست ویزیت برای دکتر:", doctorId);
+                    // اینجا می‌توان API برای ثبت نوبت را فراخوانی کرد
                 });
             });
         } catch (error) {
